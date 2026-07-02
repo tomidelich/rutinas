@@ -1,3 +1,6 @@
+Acá está el código completo para copiar y pegar:
+
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -51,15 +54,239 @@ input:focus{border-color:rgba(255,255,255,0.45);}
 .card-sub{font-size:11px;color:#555;font-weight:300;}
 .card-vol{font-family:'DM Mono',monospace;font-size:10px;color:#444;letter-spacing:1px;}
 .card-chevron{color:#444;font-size:11px;margin-left:4px;}
-/* REORDER BAR */
 .reorder-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:1px solid #1e1e1e;background:rgba(255,255,255,0.01);}
 .reorder-hint{font-family:'DM Mono',monospace;font-size:10px;color:#444;letter-spacing:1px;}
 .reorder-hint.active{color:var(--blue);}
 .reorder-toggle{background:transparent;border:1px solid #2a2a2a;border-radius:20px;color:#555;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;padding:5px 14px;transition:all .2s;}
 .reorder-toggle.on{border-color:rgba(76,201,240,0.5);color:var(--blue);background:rgba(76,201,240,0.08);}
-/* EX ROWS */
 .ex-list{border-top:1px solid #1c1c1c;}
 .ex-row{display:grid;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid #1c1c1c;transition:background .12s;user-select:none;}
+.ex-row.nm{grid-template-columns:26px 1fr auto 28px;}
+.ex-row.rm{grid-template-columns:36px 26px 1fr auto;}
+.ex-row:last-child{border-bottom:none;}
+.ex-row:hover{background:rgba(255,255,255,0.02);}
+.ex-row.dragging{opacity:.3;background:rgba(76,201,240,0.04);}
+.ex-row.dot{box-shadow:inset 0 2px 0 var(--blue);}
+.drag-handle{display:none;align-items:center;justify-content:center;color:#3a3a3a;font-size:20px;cursor:grab;width:30px;height:36px;border-radius:4px;transition:color .15s;touch-action:none;flex-shrink:0;}
+.drag-handle:active{cursor:grabbing;}
+.rm .drag-handle{display:flex;color:#555;}
+.rm .drag-handle:hover{color:var(--blue);}
+.ex-num{font-family:'DM Mono',monospace;font-size:11px;color:#444;text-align:right;}
+.ex-body{min-width:0;}
+.ex-nw{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;}
+.ex-nt{font-size:11px;color:#666;margin-top:2px;font-weight:300;}
+.ex-right{text-align:right;white-space:nowrap;min-width:80px;}
+.ex-sets{font-family:'DM Mono',monospace;font-size:13px;color:var(--text);}
+.ex-carga{font-family:'DM Mono',monospace;font-size:11px;margin-top:1px;display:block;}
+.del-btn{background:none;border:none;color:#272727;cursor:pointer;font-size:13px;padding:5px;border-radius:3px;transition:color .15s;line-height:1;}
+.del-btn:hover{color:var(--red);}
+.rm .del-btn{visibility:hidden;}
+.editable{border-bottom:1px dashed rgba(255,255,255,0.1);cursor:text;padding-bottom:1px;transition:border-color .15s;}
+.editable:hover{border-bottom-color:rgba(255,255,255,0.4);}
+.add-row{padding:10px 16px;}
+.add-btn{background:transparent;border:1px dashed var(--border);border-radius:4px;color:var(--muted);cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;padding:7px;width:100%;transition:all .15s;}
+.add-btn.pull:hover{border-color:rgba(45,198,83,0.4);color:var(--green);background:rgba(45,198,83,0.05);}
+.add-btn.push:hover{border-color:rgba(230,57,70,0.4);color:var(--red);background:rgba(230,57,70,0.05);}
+.add-btn.legs:hover{border-color:rgba(244,197,66,0.4);color:var(--yellow);background:rgba(244,197,66,0.05);}
+.save-fab{position:fixed;bottom:22px;right:18px;z-index:200;background:var(--red);border:none;border-radius:50px;color:#fff;cursor:pointer;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;padding:13px 22px;box-shadow:0 4px 20px rgba(230,57,70,0.35);transition:all .2s;}
+.save-fab.ok{background:var(--green);box-shadow:0 4px 20px rgba(45,198,83,0.35);}
+.install-banner{display:none;background:rgba(76,201,240,0.07);border:1px solid rgba(76,201,240,0.2);border-radius:6px;padding:11px 16px;margin-bottom:18px;font-size:11px;color:var(--blue);font-family:'DM Mono',monospace;line-height:1.6;}
+.install-banner.show{display:block;}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-line"></div>
+  <div class="hdr-month">JUNIO</div>
+  <div class="hdr-year">2026</div>
+  <div class="hdr-sub">Hipertrofia Natural Optimizada</div>
+</div>
+<div class="install-banner" id="installBanner">📱 Instalar: compartir del navegador → "Agregar a pantalla de inicio"</div>
+<div class="hint">✏️ Tocá cualquier texto para editar</div>
+<div class="sec-lbl">Rotación</div>
+<div class="rot-table" id="rotTable"></div>
+<div class="tabs" id="tabs">
+  <button class="tab" data-filter="all" onclick="setFilter('all')">TODO</button>
+  <button class="tab" data-filter="pull" onclick="setFilter('pull')">PULL</button>
+  <button class="tab" data-filter="push" onclick="setFilter('push')">PUSH</button>
+  <button class="tab" data-filter="legs" onclick="setFilter('legs')">LEGS</button>
+</div>
+<div id="rutinas"></div>
+<button class="save-fab" id="saveFab" onclick="save()">GUARDAR</button>
+<script>
+const DEFAULT={rotacion:[{semana:"Semana 1",sesiones:"1 Pull · 1 Push · 1 Legs"},{semana:"Semana 2",sesiones:"1 Push · 1 Pull · 1 Legs"},{semana:"Semana 3",sesiones:"Doble Push"},{semana:"Semana 4",sesiones:"Doble Pull"}],rutinas:[{id:"pullA",nombre:"PULL A",subtitulo:"Dorsal + base pesada",tipo:"pull",volumen:"~18 series",open:true,reordering:false,ejercicios:[{id:1,nombre:"Jalón prono en dorsalera",sets:"4×8–10",carga:"67.5kg",nota:"Sin strap · Solo aprox. en 1er ej.",badge:"prog"},{id:2,nombre:"Remo polea neutro cerrado",sets:"4×8–10",carga:"77.5kg",nota:"Al ombligo · Con strap",badge:"prog"},{id:3,nombre:"Remo banco inclinado mancuernas",sets:"3×8–10",carga:"15–17kg c/u",nota:"Pronado · Codos abiertos · Al pecho",badge:"new"},{id:4,nombre:"Pullover polea",sets:"3×12–15",carga:"40kg",nota:"Barra recta",badge:""},{id:5,nombre:"Posterior polea",sets:"3×12–15",carga:"2 lingotes",nota:"Técnico",badge:""},{id:6,nombre:"Bíceps inclinado",sets:"3×8–10",carga:"13kg",nota:"Última serie con forzadas",badge:""},{id:7,nombre:"Martillo polea",sets:"2×10–12",carga:"—",nota:"",badge:""},{id:8,nombre:"Trapecio banco inclinado smith",sets:"3×15",carga:"40kg",nota:"",badge:""}]},{id:"pullB",nombre:"PULL B",subtitulo:"Densidad + frecuencia",tipo:"pull",volumen:"~17–18 series",open:true,reordering:false,ejercicios:[{id:1,nombre:"Jalón supino",sets:"3×10–12",carga:"—",nota:"",badge:""},{id:2,nombre:"Remo banco inclinado mancuernas",sets:"3×10–12",carga:"carga S1",nota:"Pronado · Codos abiertos · Al pecho",badge:""},{id:3,nombre:"Remo mancuerna banco (unilateral)",sets:"3×10–12",carga:"—",nota:"",badge:""},{id:4,nombre:"Facepull",sets:"3×15",carga:"—",nota:"",badge:""},{id:5,nombre:"Bíceps",sets:"2–3×10",carga:"—",nota:"",badge:""},{id:6,nombre:"Trapecio",sets:"3×15",carga:"—",nota:"",badge:""}]},{id:"pushA",nombre:"PUSH A",subtitulo:"Fuerza",tipo:"push",volumen:"~19 series",open:true,reordering:false,ejercicios:[{id:1,nombre:"Press banca plano",sets:"4×6–8",carga:"35kg/lado",nota:"Sin fallo",badge:""},{id:2,nombre:"Press inclinado smith",sets:"3×8–10",carga:"30kg + barra",nota:"",badge:""},{id:3,nombre:"Aperturas",sets:"3×12–15",carga:"4 lingotes",nota:"",badge:""},{id:4,nombre:"Press militar",sets:"3×8–10",carga:"8.5kg/lado",nota:"",badge:""},{id:5,nombre:"Laterales mancuernas",sets:"3×12–15",carga:"—",nota:"",badge:""},{id:6,nombre:"Tríceps soga / barra recta",sets:"3×10–12",carga:"60kg",nota:"",badge:""},{id:7,nombre:"Core",sets:"3×15",carga:"—",nota:"",badge:""}]},{id:"pushB",nombre:"PUSH B",subtitulo:"Volumen + bombeo",tipo:"push",volumen:"~17 series",open:true,reordering:false,ejercicios:[{id:1,nombre:"Press banca plano",sets:"3×8–10",carga:"35kg/lado",nota:"",badge:""},{id:2,nombre:"Inclinado mancuernas",sets:"3×8–10",carga:"25kg/lado",nota:"",badge:""},{id:3,nombre:"Aperturas",sets:"3×12–15",carga:"4 lingotes",nota:"",badge:""},{id:4,nombre:"Laterales",sets:"3×15",carga:"10kg",nota:"",badge:""},{id:5,nombre:"Tríceps polea",sets:"3×12–15",carga:"60kg barra recta",nota:"",badge:""},{id:6,nombre:"Fondos",sets:"2×AMRAP",carga:"—",nota:"",badge:""}]},{id:"legsA",nombre:"LEGS A",subtitulo:"Cuádriceps dominante",tipo:"legs",volumen:"~18 series",open:true,reordering:false,ejercicios:[{id:1,nombre:"Sentadilla smith / libre",sets:"4×6–8",carga:"+2.5kg vs Mayo",nota:"Sin fallo",badge:""},{id:2,nombre:"Prensa",sets:"4×10–12",carga:"245kg",nota:"",badge:""},{id:3,nombre:"Femoral acostado",sets:"3×8–10",carga:"8 lingotes",nota:"",badge:""},{id:4,nombre:"Extensión cuádriceps",sets:"3×12–15",carga:"45kg",nota:"",badge:""},{id:5,nombre:"Gemelos",sets:"4×12–15",carga:"máx + 40kg",nota:"",badge:""}]},{id:"legsB",nombre:"LEGS B",subtitulo:"Posterior dominante",tipo:"legs",volumen:"~18 series",open:true,reordering:false,ejercicios:[{id:1,nombre:"Hack / sentadilla",sets:"4×6–8",carga:"60kg/lado",nota:"Sin fallo",badge:""},{id:2,nombre:"Prensa inclinada",sets:"4×10–12",carga:"255kg",nota:"",badge:""},{id:3,nombre:"Rumano",sets:"3×8–10",carga:"—",nota:"",badge:""},{id:4,nombre:"Extensión",sets:"3×12–15",carga:"50kg",nota:"",badge:""},{id:5,nombre:"Gemelos",sets:"4×12–15",carga:"—",nota:"",badge:""}]}]};
+
+let state=JSON.parse(JSON.stringify(DEFAULT));
+let filter="all";
+try{const s=localStorage.getItem("junio2026v2");if(s)state=JSON.parse(s);}catch(e){}
+
+function save(){
+  try{localStorage.setItem("junio2026v2",JSON.stringify(state));}catch(e){}
+  const b=document.getElementById("saveFab");
+  b.textContent="✓ GUARDADO";b.classList.add("ok");
+  setTimeout(()=>{b.textContent="GUARDAR";b.classList.remove("ok");},2000);
+}
+function setFilter(f){filter=f;render();}
+
+function makeEditable(el,getter,setter){
+  el.classList.add("editable");
+  el.addEventListener("click",e=>{
+    e.stopPropagation();
+    const cur=getter();
+    const inp=document.createElement("input");
+    inp.value=cur;
+    inp.style.cssText="display:inline;width:"+(Math.max(String(cur).length,6)*8+20)+"px;font-size:inherit;font-family:inherit;";
+    el.replaceWith(inp);inp.focus();inp.select();
+    const commit=()=>{setter(inp.value.trim()||cur);render();};
+    inp.addEventListener("blur",commit);
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")inp.blur();if(e.key==="Escape"){setter(cur);render();}});
+  });
+}
+
+let td=null;
+
+function startTouchDrag(e,rutinaId,exIdx){
+  if(e.touches.length!==1)return;
+  e.preventDefault();
+  const touch=e.touches[0];
+  const rowEl=e.currentTarget.closest(".ex-row");
+  const clone=rowEl.cloneNode(true);
+  clone.style.cssText="position:fixed;z-index:999;opacity:.8;pointer-events:none;left:"+(touch.clientX-20)+"px;top:"+(touch.clientY-30)+"px;width:"+rowEl.offsetWidth+"px;background:#1e1e1e;border:1px solid var(--blue);border-radius:5px;padding:10px 16px;";
+  document.body.appendChild(clone);
+  rowEl.classList.add("dragging");
+  td={rutinaId,exIdx,rowEl,clone};
+}
+
+document.addEventListener("touchmove",e=>{
+  if(!td)return;
+  e.preventDefault();
+  const touch=e.touches[0];
+  td.clone.style.left=(touch.clientX-20)+"px";
+  td.clone.style.top=(touch.clientY-30)+"px";
+  document.querySelectorAll(".dot").forEach(el=>el.classList.remove("dot"));
+  td.clone.style.display="none";
+  const under=document.elementFromPoint(touch.clientX,touch.clientY);
+  td.clone.style.display="";
+  const target=under&&under.closest(".ex-row");
+  if(target&&target!==td.rowEl)target.classList.add("dot");
+},{passive:false});
+
+document.addEventListener("touchend",e=>{
+  if(!td)return;
+  const touch=e.changedTouches[0];
+  td.clone.remove();
+  td.rowEl.classList.remove("dragging");
+  document.querySelectorAll(".dot").forEach(el=>el.classList.remove("dot"));
+  td.clone.style.display="none";
+  const under=document.elementFromPoint(touch.clientX,touch.clientY);
+  const target=under&&under.closest(".ex-row");
+  if(target&&target!==td.rowEl){
+    const toIdx=parseInt(target.dataset.exIdx);
+    const toRut=target.dataset.rutinaId;
+    if(toRut===td.rutinaId&&!isNaN(toIdx)&&toIdx!==td.exIdx){
+      const r=state.rutinas.find(r=>r.id===td.rutinaId);
+      const arr=r.ejercicios;
+      const item=arr.splice(td.exIdx,1)[0];
+      arr.splice(Math.min(toIdx,arr.length),0,item);
+      render();
+    }
+  }
+  td=null;
+});
+
+let md=null;
+function mDragStart(e,rutinaId,exIdx){md={rutinaId,exIdx};e.dataTransfer.effectAllowed="move";e.currentTarget.classList.add("dragging");}
+function mDragEnd(e){e.currentTarget.classList.remove("dragging");document.querySelectorAll(".dot").forEach(el=>el.classList.remove("dot"));md=null;}
+function mDragOver(e,rutinaId,exIdx){e.preventDefault();if(!md||md.rutinaId!==rutinaId)return;document.querySelectorAll(".dot").forEach(el=>el.classList.remove("dot"));e.currentTarget.classList.add("dot");}
+function mDrop(e,rutinaId,exIdx){
+  e.preventDefault();
+  if(!md||md.rutinaId!==rutinaId||md.exIdx===exIdx)return;
+  const r=state.rutinas.find(r=>r.id===rutinaId);
+  const arr=r.ejercicios;
+  const item=arr.splice(md.exIdx,1)[0];
+  arr.splice(Math.min(exIdx,arr.length),0,item);
+  md=null;render();
+}
+
+function render(){renderRotation();renderTabs();renderRutinas();}
+
+function renderRotation(){
+  const el=document.getElementById("rotTable");el.innerHTML="";
+  state.rotacion.forEach((row,i)=>{
+    const div=document.createElement("div");div.className="rot-row";
+    const k=document.createElement("span");k.className="rot-key";k.textContent=row.semana;
+    makeEditable(k,()=>row.semana,v=>{state.rotacion[i].semana=v;});
+    const v=document.createElement("span");v.className="rot-val";v.textContent=row.sesiones;
+    makeEditable(v,()=>row.sesiones,v2=>{state.rotacion[i].sesiones=v2;});
+    div.appendChild(k);div.appendChild(v);el.appendChild(div);
+  });
+}
+
+function renderTabs(){
+  document.querySelectorAll(".tab").forEach(t=>{
+    const f=t.dataset.filter;
+    t.className="tab"+(filter===f?" active-"+f:"");
+  });
+}
+
+function renderRutinas(){
+  const container=document.getElementById("rutinas");container.innerHTML="";
+  const list=filter==="all"?state.rutinas:state.rutinas.filter(r=>r.tipo===filter);
+  list.forEach(rutina=>{
+    const colBorder={pull:"rgba(45,198,83,0.25)",push:"rgba(230,57,70,0.25)",legs:"rgba(244,197,66,0.25)"}[rutina.tipo];
+    const reord=rutina.reordering;
+    const card=document.createElement("div");
+    card.className="card "+(rutina.open?"open ":"")+rutina.tipo;
+    const hdr=document.createElement("div");
+    hdr.className="card-hdr "+rutina.tipo+(rutina.open?"":" closed");
+    hdr.style.borderBottom=rutina.open?"1px solid "+colBorder:"none";
+    hdr.innerHTML="<div class='card-dot'></div><div style='flex:1'><span class='card-title'>"+rutina.nombre+"</span><span class='card-sub' style='margin-left:8px'>"+rutina.subtitulo+"</span></div><span class='card-vol'>"+rutina.volumen+"</span><span class='card-chevron'>"+(rutina.open?"&#9650;":"&#9660;")+"</span>";
+    hdr.addEventListener("click",()=>{rutina.open=!rutina.open;if(!rutina.open)rutina.reordering=false;render();});
+    card.appendChild(hdr);
+    if(rutina.open){
+      const rbar=document.createElement("div");rbar.className="reorder-bar";
+      const hint=document.createElement("span");hint.className="reorder-hint"+(reord?" active":"");hint.textContent=reord?"⠿ Arrastrá para mover":"Orden de ejercicios";
+      const tog=document.createElement("button");tog.className="reorder-toggle"+(reord?" on":"");tog.textContent=reord?"LISTO":"REORDENAR";
+      tog.addEventListener("click",e=>{e.stopPropagation();rutina.reordering=!rutina.reordering;render();});
+      rbar.appendChild(hint);rbar.appendChild(tog);card.appendChild(rbar);
+      const exList=document.createElement("div");exList.className="ex-list";
+      rutina.ejercicios.forEach((ex,exIdx)=>{
+        const row=document.createElement("div");
+        row.className="ex-row "+(reord?"rm":"nm");
+        row.dataset.rutinaId=rutina.id;
+        row.dataset.exIdx=exIdx;
+        if(reord){row.draggable=true;row.addEventListener("dragstart",e=>mDragStart(e,rutina.id,exIdx));row.addEventListener("dragend",mDragEnd);row.addEventListener("dragover",e=>mDragOver(e,rutina.id,exIdx));row.addEventListener("drop",e=>mDrop(e,rutina.id,exIdx));}
+        row.innerHTML="<span class='drag-handle' title='Arrastrá para mover'>⠿</span><span class='ex-num'>"+String(exIdx+1).padStart(2,"0")+"</span><div class='ex-body'><div class='ex-nw'><span class='nm'>"+ex.nombre+"</span></div>"+(ex.nota?"<div class='ex-nt'><span class='nt'>"+ex.nota+"</span></div>":"")+("</div><div class='ex-right'><div><span class='ex-sets st'>"+ex.sets+"</span></div><div><span class='ex-carga cr'>"+(ex.carga||"—")+"</span></div></div><button class='del-btn' title='Eliminar'>✕</button>");
+        row.querySelector(".drag-handle").addEventListener("touchstart",e=>startTouchDrag(e,rutina.id,exIdx),{passive:false});
+        if(!reord){
+          makeEditable(row.querySelector(".nm"),()=>ex.nombre,v=>{ex.nombre=v;});
+          const nt=row.querySelector(".nt");if(nt)makeEditable(nt,()=>ex.nota,v=>{ex.nota=v;});
+          makeEditable(row.querySelector(".st"),()=>ex.sets,v=>{ex.sets=v;});
+          makeEditable(row.querySelector(".cr"),()=>ex.carga,v=>{ex.carga=v;});
+        }
+        row.querySelector(".del-btn").addEventListener("click",e=>{e.stopPropagation();if(reord)return;rutina.ejercicios.splice(exIdx,1);render();});
+        exList.appendChild(row);
+      });
+      card.appendChild(exList);
+      if(!reord){
+        const addRow=document.createElement("div");addRow.className="add-row";
+        const addBtn=document.createElement("button");addBtn.className="add-btn "+rutina.tipo;addBtn.textContent="+ AGREGAR EJERCICIO";
+        addBtn.addEventListener("click",()=>{const maxId=Math.max(...rutina.ejercicios.map(e=>e.id),0);rutina.ejercicios.push({id:maxId+1,nombre:"Nuevo ejercicio",sets:"3×10–12",carga:"—",nota:"",badge:""});render();});
+        addRow.appendChild(addBtn);card.appendChild(addRow);
+      }
+    }
+    container.appendChild(card);
+  });
+}
+
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.navigator.standalone)
+  document.getElementById("installBanner").classList.add("show");
+
+render();
+</script>
+</body>
+</html>
+```.ex-row{display:grid;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid #1c1c1c;transition:background .12s;user-select:none;}
 .ex-row.nm{grid-template-columns:26px 1fr auto 28px;}
 .ex-row.rm{grid-template-columns:36px 26px 1fr auto;}
 .ex-row:last-child{border-bottom:none;}
