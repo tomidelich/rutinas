@@ -266,7 +266,7 @@ function renderRutinas(){
         if(reord){row.draggable=true;row.addEventListener("dragstart",e=>mDragStart(e,rutina.id,exIdx));row.addEventListener("dragend",mDragEnd);row.addEventListener("dragover",e=>mDragOver(e,rutina.id,exIdx));row.addEventListener("drop",e=>mDrop(e,rutina.id,exIdx));}
         const badgeHTML="";
         const cc="";
-        row.innerHTML="<span class='drag-handle' title='Arrastrá para mover'>⠿</span><span class='ex-num'>"+String(exIdx+1).padStart(2,"0")+"</span><div class='ex-body'><div class='ex-nw'><span class='nm'>"+ex.nombre+"</span>"+badgeHTML+"</div>"+(ex.nota?"<div class='ex-nt'><span class='nt'>"+ex.nota+"</span></div>":"")+"</div><div class='ex-right'><div><span class='ex-sets st'>"+ex.sets+"</span></div><div><span class='ex-carga "+cc+" cr'>"+(ex.carga||"—")+"</span></div></div><button class='del-btn' title='Eliminar'>✕</button>";
+        row.innerHTML="<span class='drag-handle' title='Arrastrá para mover'>⠿</span><span class='ex-num'>"+String(exIdx+1).padStart(2,"0")+"</span><div class='ex-body'><div class='ex-nw'><span class='nm'>"+ex.nombre+"</span>"+badgeHTML+"</div>"+"<div class='ex-nt'><span class='nt'>"+(ex.nota||"")+"</span></div>"
 
         // Touch drag on handle only
         row.querySelector(".drag-handle").addEventListener("touchstart",e=>startTouchDrag(e,rutina.id,exIdx),{passive:false});
